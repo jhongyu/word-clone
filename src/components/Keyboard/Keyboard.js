@@ -1,40 +1,36 @@
 import React from 'react';
 
-import { range } from '../../utils';
-import { KEY_BOARD } from '../../constants';
+import { KEY_ROWS } from '../../constants';
 
-function Key({ value, checkResult }) {
-  const [className, setClassName] = React.useState('');
+function getStatusByLetter(validateGuesses) {
+  const statusObj = {};
 
-  React.useEffect(() => {
-    if (checkResult) {
-      const index = checkResult.findIndex((item) => item.letter === value);
-      if (index >= 0) {
-        setClassName(`key ${checkResult[index].status}`);
-      }
-    } else {
-      setClassName('key');
-    }
-  }, [checkResult, value]);
+  validateGuesses.forEach((guess) => {
+    guess.forEach(({ letter, status }) => {
+      statusObj[letter] = status;
+    });
+  });
 
-  return <div className={className}>{value}</div>;
+  return statusObj;
 }
 
-function Row({ keys, checkResult }) {
-  return (
-    <div className="row">
-      {keys.map((value) => (
-        <Key key={value} value={value} checkResult={checkResult} />
-      ))}
-    </div>
-  );
-}
+function Keyboard({ validateGuesses }) {
+  const statusByLetter = getStatusByLetter(validateGuesses);
 
-function Keyboard({ checkResult }) {
   return (
     <div className="keyboard">
-      {range(3).map((num) => (
-        <Row key={num} keys={KEY_BOARD[num]} checkResult={checkResult} />
+      {KEY_ROWS.map((row, index) => (
+        <div key={index} className="keyboard-row">
+          {row.map((letter) => {
+            const className = statusByLetter[letter] ? `key ${statusByLetter[letter]}` : 'key';
+
+            return (
+              <div key={letter} className={className}>
+                {letter}
+              </div>
+            );
+          })}
+        </div>
       ))}
     </div>
   );
