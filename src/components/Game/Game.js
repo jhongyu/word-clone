@@ -3,11 +3,13 @@ import React from 'react';
 import { sample } from '../../utils';
 import { WORDS } from '../../data';
 import { NUM_OF_GUESSES_ALLOWED } from '../../constants';
+import { checkGuess } from '../../game-helpers';
 
 import GuessInput from '../GuessInput';
 import GuessResults from '../GuessResults';
 import WonBanner from '../WonBanner';
 import LostBanner from '../LostBanner';
+import Keyboard from '../Keyboard';
 
 function Game() {
   const [answer, setAnswer] = React.useState(() => {
@@ -15,8 +17,11 @@ function Game() {
   });
   const [guesses, setGuesses] = React.useState([]);
   const [gameStatus, setGameStatus] = React.useState('running');
+  const [checkResult, setCheckResult] = React.useState(null);
 
   const handleSubmitGuess = (tentativeGuess) => {
+    setCheckResult(checkGuess(tentativeGuess, answer));
+
     const nextGuesses = [...guesses, tentativeGuess];
     setGuesses(nextGuesses);
 
@@ -31,6 +36,7 @@ function Game() {
     setAnswer(sample(WORDS));
     setGuesses([]);
     setGameStatus('running');
+    setCheckResult(null);
   };
 
   return (
@@ -41,6 +47,7 @@ function Game() {
         <WonBanner numOfGuesses={guesses.length} handleRestart={handleRestart} />
       )}
       {gameStatus === 'lost' && <LostBanner answer={answer} handleRestart={handleRestart} />}
+      <Keyboard checkResult={checkResult} />
     </>
   );
 }
